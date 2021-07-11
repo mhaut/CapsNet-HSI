@@ -75,10 +75,12 @@ def test(testloader, model, criterion, epoch, use_cuda, num_classes, lam_recon):
 def predict(testloader, model, criterion, use_cuda):
     model.eval()
     predicted = []
-    for batch_idx, (inputs, targets) in enumerate(testloader):
-        if use_cuda: inputs = inputs.cuda()
-        inputs, targets = torch.autograd.Variable(inputs, volatile=True), torch.autograd.Variable(targets)
-        [predicted.append(a) for a in model(inputs).data.cpu().numpy()] 
+    with torch.no_grad():
+        for x, _ in testloader:
+            if use_cuda: x = x.cuda()
+            y_pred, _ = model(Variable(x))
+            [predicted.append(yy) for yy in np.array(y_pred.data.cpu())]
+    print("llllllllllen", len(predicted))
     return np.array(predicted)
 
 
@@ -114,15 +116,6 @@ def main():
     use_cuda = torch.cuda.is_available()
     if use_cuda: torch.backends.cudnn.benchmark = True
 
-    if args.spatialsize < 9: avgpoosize = 1
-    elif args.spatialsize <= 11: avgpoosize = 2
-    elif args.spatialsize == 15: avgpoosize = 3
-    elif args.spatialsize == 19: avgpoosize = 4
-    elif args.spatialsize == 21: avgpoosize = 5
-    elif args.spatialsize == 27: avgpoosize = 6
-    elif args.spatialsize == 29: avgpoosize = 7
-    else: print("spatialsize no tested")
-
     outpatches = {"5":1,"7":3,"9":5,"11":7, "13":9, "15":11, "17":13, "19":15, "21":17, "23":19, "27":23}
     outputsizepatch = outpatches[str(args.spatialsize)]
     model = CapsuleNet(input_size=[n_bands, args.spatialsize, args.spatialsize], classes=num_classes, routings=args.routings, outpatchdim=outputsizepatch)
@@ -134,8 +127,6 @@ def main():
 
     best_acc = -1
     for epoch in range(args.epochs):
-        #adjust_learning_rate(optimizer, epoch, args)
-
         train_loss, train_acc = train(train_loader, model, criterion, optimizer, epoch, use_cuda, num_classes, args.lam_recon)
         if args.use_val: test_loss, test_acc = test(val_loader, model, criterion, epoch, use_cuda, num_classes, args.lam_recon)
         else: test_loss, test_acc = test(test_loader, model, criterion, epoch, use_cuda, num_classes, args.lam_recon)
@@ -159,7 +150,7 @@ def main():
     start_epoch = checkpoint['epoch']
     model.load_state_dict(checkpoint['state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer'])
-    test_loss, test_acc = test(test_loader, model, criterion, epoch, use_cuda)
+    test_loss, test_acc = test(test_loader, model, criterion, epoch, use_cuda, num_classes, args.lam_recon)
     print("FINAL:      LOSS", test_loss, "ACCURACY", test_acc)
     classification, confusion, results = auxil.reports(np.argmax(predict(test_loader, model, criterion, use_cuda), axis=1), np.array(test_loader.dataset.__labels__()), args.dataset)
     print(args.dataset, results)
