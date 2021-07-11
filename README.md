@@ -8,8 +8,9 @@ DOI: 10.1109/TGRS.2018.2871782
 vol. 57, no. 4, pp. 2145-2160, April 2019.
 ```
 
-![CapsNet](https://github.com/mhaut/CapsNet-HSI/blob/master/images/capsnet.png)
-
+<p align="center">
+<img src="images/capsnet.png" width="1000" align="center"> 
+</p>
 
 
 ## Example of use
