@@ -17,7 +17,7 @@ vol. 57, no. 4, pp. 2145-2160, April 2019.
 
 ### Installation
 ```
-Download and install Anaconda
+Download and install Anaconda: https://docs.anaconda.com/anaconda/install/linux/
 conda env create -f environment.yml
 conda activate CapsNet
 ```
