@@ -14,6 +14,14 @@ vol. 57, no. 4, pp. 2145-2160, April 2019.
 
 
 ## Example of use
+
+### Installation
+```
+Download and install Anaconda
+conda env create -f environment.yml
+conda activate CapsNet
+```
+
 ### Download datasets
 
 ```

@@ -80,7 +80,6 @@ def predict(testloader, model, criterion, use_cuda):
             if use_cuda: x = x.cuda()
             y_pred, _ = model(Variable(x))
             [predicted.append(yy) for yy in np.array(y_pred.data.cpu())]
-    print("llllllllllen", len(predicted))
     return np.array(predicted)
 
 
